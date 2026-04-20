@@ -1,0 +1,264 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans)}
+.wrap{max-width:520px;margin:0 auto;padding:1rem 0.75rem 2rem}
+.header{text-align:center;padding:1rem 0 1.25rem}
+.header h1{font-size:22px;font-weight:500;color:var(--color-text-primary);letter-spacing:0.5px}
+.header p{font-size:13px;color:var(--color-text-secondary);margin-top:4px}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem 1.25rem;margin-bottom:12px}
+.card-title{font-size:13px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:13px;color:var(--color-text-secondary);margin-bottom:5px}
+.field input,.field textarea,.field select{width:100%;font-size:15px;padding:8px 10px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-secondary);color:var(--color-text-primary);outline:none}
+.field input:focus,.field textarea:focus{border-color:var(--color-border-primary);box-shadow:0 0 0 2px rgba(120,120,120,0.12)}
+.field textarea{resize:vertical;min-height:72px;line-height:1.5}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn-add{width:100%;padding:10px;background:var(--color-background-secondary);border:0.5px dashed var(--color-border-secondary);border-radius:var(--border-radius-md);color:var(--color-text-secondary);font-size:14px;cursor:pointer;margin-top:4px}
+.btn-add:hover{background:var(--color-background-tertiary);color:var(--color-text-primary)}
+.venta-item{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px 12px;margin-bottom:8px;position:relative}
+.venta-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.venta-num{font-size:12px;font-weight:500;color:var(--color-text-secondary)}
+.btn-del{background:none;border:none;color:var(--color-text-tertiary);font-size:16px;cursor:pointer;padding:0 2px;line-height:1}
+.btn-del:hover{color:var(--color-text-danger, #c0392b)}
+.precio-tag{font-size:13px;color:var(--color-text-secondary)}
+.precio-tag span{font-weight:500;color:var(--color-text-primary)}
+.divider{border:none;border-top:0.5px solid var(--color-border-tertiary);margin:8px 0}
+.gasto-item{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.gasto-item input{flex:1}
+.gasto-item input.precio{max-width:110px}
+.gasto-item select{max-width:120px;font-size:13px;padding:8px 6px}
+.btn-del-g{background:none;border:none;color:var(--color-text-tertiary);font-size:18px;cursor:pointer;flex-shrink:0}
+.resumen{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem 1.25rem;margin-bottom:12px}
+.res-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:14px;color:var(--color-text-secondary)}
+.res-row span:last-child{font-weight:500;color:var(--color-text-primary)}
+.res-total{display:flex;justify-content:space-between;align-items:center;padding:10px 0 4px;border-top:0.5px solid var(--color-border-secondary);margin-top:4px}
+.res-total .label{font-size:15px;font-weight:500;color:var(--color-text-primary)}
+.res-total .valor{font-size:20px;font-weight:500}
+.verde{color:#1D9E75}
+.rojo{color:#c0392b}
+.btn-guardar{width:100%;padding:13px;background:var(--color-text-primary);color:var(--color-background-primary);border:none;border-radius:var(--border-radius-md);font-size:15px;font-weight:500;cursor:pointer;margin-top:4px}
+.btn-guardar:hover{opacity:0.85}
+.btn-guardar:active{transform:scale(0.99)}
+.historial-item{border-bottom:0.5px solid var(--color-border-tertiary);padding:10px 0}
+.historial-item:last-child{border-bottom:none}
+.hist-fecha{font-size:12px;color:var(--color-text-secondary)}
+.hist-detalle{font-size:13px;color:var(--color-text-primary);margin:2px 0}
+.hist-saldo{font-size:14px;font-weight:500}
+.empty{text-align:center;color:var(--color-text-tertiary);font-size:13px;padding:1.5rem 0}
+.badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;margin-left:6px;vertical-align:middle}
+.badge-ef{background:#EAF3DE;color:#3B6D11}
+.badge-yp{background:#E6F1FB;color:#185FA5}
+.tabs{display:flex;gap:4px;margin-bottom:14px}
+.tab{flex:1;padding:8px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);background:var(--color-background-secondary);color:var(--color-text-secondary);font-size:13px;cursor:pointer;text-align:center}
+.tab.active{background:var(--color-text-primary);color:var(--color-background-primary);border-color:var(--color-text-primary)}
+.panel{display:none}.panel.active{display:block}
+</style>
+<h2 class="sr-only">Registro diario de ventas y gastos — ROSSY</h2>
+<div class="wrap">
+  <div class="header">
+    <h1>ROSSY</h1>
+    <p>Registro diario de caja</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('registro')">Nuevo registro</button>
+    <button class="tab" onclick="showTab('historial')">Historial</button>
+  </div>
+
+  <div class="panel active" id="tab-registro">
+    <div class="card">
+      <div class="card-title">Datos del día</div>
+      <div class="row2">
+        <div class="field">
+          <label>Fecha</label>
+          <input type="date" id="fecha">
+        </div>
+        <div class="field">
+          <label>Caja inicial (S/)</label>
+          <input type="number" id="caja" placeholder="0.00" step="0.01" min="0">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Ventas del día</div>
+      <div id="ventas-list"></div>
+      <button class="btn-add" onclick="addVenta()">+ Agregar venta</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Gastos del día</div>
+      <div id="gastos-list"></div>
+      <button class="btn-add" onclick="addGasto()">+ Agregar gasto</button>
+    </div>
+
+    <div class="resumen" id="resumen">
+      <div class="res-row"><span>Caja inicial</span><span id="r-caja">S/ 0.00</span></div>
+      <div class="res-row"><span>Total ventas</span><span id="r-ventas">S/ 0.00</span></div>
+      <div class="res-row"><span>Total gastos</span><span id="r-gastos">S/ 0.00</span></div>
+      <div class="res-total">
+        <span class="label">Saldo final</span>
+        <span class="valor verde" id="r-saldo">S/ 0.00</span>
+      </div>
+    </div>
+
+    <button class="btn-guardar" onclick="guardar()">Guardar registro del día</button>
+  </div>
+
+  <div class="panel" id="tab-historial">
+    <div class="card">
+      <div class="card-title">Registros guardados</div>
+      <div id="historial-list"><div class="empty">Sin registros aún</div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+let ventas = [];
+let gastos = [];
+let ventaId = 0;
+let gastoId = 0;
+
+document.getElementById('fecha').value = new Date().toISOString().split('T')[0];
+document.getElementById('fecha').addEventListener('change', recalc);
+document.getElementById('caja').addEventListener('input', recalc);
+
+function showTab(t){
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+t).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if(t==='historial') renderHistorial();
+}
+
+function addVenta(){
+  const id = ++ventaId;
+  ventas.push({id, detalle:'', precio:''});
+  renderVentas();
+}
+
+function removeVenta(id){
+  ventas = ventas.filter(v=>v.id!==id);
+  renderVentas();
+  recalc();
+}
+
+function renderVentas(){
+  const el = document.getElementById('ventas-list');
+  if(!ventas.length){el.innerHTML='';return;}
+  el.innerHTML = ventas.map((v,i)=>`
+    <div class="venta-item" id="vi-${v.id}">
+      <div class="venta-header">
+        <span class="venta-num">Venta ${i+1}</span>
+        <button class="btn-del" onclick="removeVenta(${v.id})">×</button>
+      </div>
+      <div class="field" style="margin-bottom:8px">
+        <textarea placeholder="Descripción: cantidad, modelo, código..." rows="2" style="min-height:52px" onchange="ventaChange(${v.id},'detalle',this.value)">${v.detalle}</textarea>
+      </div>
+      <div class="field" style="margin-bottom:0">
+        <input type="number" placeholder="Precio total (S/)" step="0.01" min="0" value="${v.precio}" oninput="ventaChange(${v.id},'precio',this.value)">
+      </div>
+    </div>`).join('');
+  recalc();
+}
+
+function ventaChange(id, campo, val){
+  const v = ventas.find(x=>x.id===id);
+  if(v) v[campo]=val;
+  recalc();
+}
+
+function addGasto(){
+  const id = ++gastoId;
+  gastos.push({id, concepto:'', monto:'', tipo:'efectivo'});
+  renderGastos();
+}
+
+function removeGasto(id){
+  gastos = gastos.filter(g=>g.id!==id);
+  renderGastos();
+  recalc();
+}
+
+function renderGastos(){
+  const el = document.getElementById('gastos-list');
+  if(!gastos.length){el.innerHTML='';return;}
+  el.innerHTML = gastos.map(g=>`
+    <div class="gasto-item">
+      <input type="text" placeholder="Concepto (ej: servicio de agua)" value="${g.concepto}" onchange="gastoChange(${g.id},'concepto',this.value)">
+      <input type="number" class="precio" placeholder="S/" step="0.01" min="0" value="${g.monto}" oninput="gastoChange(${g.id},'monto',this.value)">
+      <select onchange="gastoChange(${g.id},'tipo',this.value)">
+        <option value="efectivo" ${g.tipo==='efectivo'?'selected':''}>Efectivo</option>
+        <option value="yape" ${g.tipo==='yape'?'selected':''}>Yape</option>
+        <option value="otro" ${g.tipo==='otro'?'selected':''}>Otro</option>
+      </select>
+      <button class="btn-del-g" onclick="removeGasto(${g.id})">×</button>
+    </div>`).join('');
+  recalc();
+}
+
+function gastoChange(id, campo, val){
+  const g = gastos.find(x=>x.id===id);
+  if(g) g[campo]=val;
+  recalc();
+}
+
+function recalc(){
+  const caja = parseFloat(document.getElementById('caja').value)||0;
+  const totalVentas = ventas.reduce((s,v)=>s+(parseFloat(v.precio)||0),0);
+  const totalGastos = gastos.reduce((s,g)=>s+(parseFloat(g.monto)||0),0);
+  const saldo = caja + totalVentas - totalGastos;
+  document.getElementById('r-caja').textContent = 'S/ '+caja.toFixed(2);
+  document.getElementById('r-ventas').textContent = 'S/ '+totalVentas.toFixed(2);
+  document.getElementById('r-gastos').textContent = 'S/ '+totalGastos.toFixed(2);
+  const sEl = document.getElementById('r-saldo');
+  sEl.textContent = 'S/ '+saldo.toFixed(2);
+  sEl.className = 'valor '+(saldo>=0?'verde':'rojo');
+}
+
+async function guardar(){
+  const fecha = document.getElementById('fecha').value;
+  const caja = parseFloat(document.getElementById('caja').value)||0;
+  if(!fecha){alert('Por favor ingresa la fecha.');return;}
+  if(!ventas.length && !gastos.length){alert('Agrega al menos una venta o gasto.');return;}
+  const totalVentas = ventas.reduce((s,v)=>s+(parseFloat(v.precio)||0),0);
+  const totalGastos = gastos.reduce((s,g)=>s+(parseFloat(g.monto)||0),0);
+  const saldo = caja+totalVentas-totalGastos;
+  const registro = {fecha, caja, ventas:[...ventas], gastos:[...gastos], totalVentas, totalGastos, saldo, ts:Date.now()};
+  try{
+    const existing = await window.storage.get('registros').catch(()=>null);
+    const lista = existing ? JSON.parse(existing.value) : [];
+    lista.unshift(registro);
+    await window.storage.set('registros', JSON.stringify(lista));
+    alert('Registro guardado correctamente.');
+    ventas=[];gastos=[];ventaId=0;gastoId=0;
+    document.getElementById('caja').value='';
+    document.getElementById('fecha').value=new Date().toISOString().split('T')[0];
+    renderVentas();renderGastos();recalc();
+  }catch(e){alert('Error al guardar. Intenta de nuevo.');}
+}
+
+async function renderHistorial(){
+  const el = document.getElementById('historial-list');
+  try{
+    const res = await window.storage.get('registros').catch(()=>null);
+    if(!res){el.innerHTML='<div class="empty">Sin registros aún</div>';return;}
+    const lista = JSON.parse(res.value);
+    if(!lista.length){el.innerHTML='<div class="empty">Sin registros aún</div>';return;}
+    el.innerHTML = lista.map(r=>{
+      const fDisplay = new Date(r.fecha+'T12:00:00').toLocaleDateString('es-PE',{weekday:'long',day:'numeric',month:'long'});
+      const gastosStr = r.gastos.map(g=>`${g.concepto} <span class="badge ${g.tipo==='yape'?'badge-yp':'badge-ef'}">${g.tipo}</span> S/${(parseFloat(g.monto)||0).toFixed(2)}`).join(' · ');
+      return `<div class="historial-item">
+        <div class="hist-fecha">${fDisplay} — Caja inicial: S/${r.caja.toFixed(2)}</div>
+        <div class="hist-detalle" style="margin-top:4px">${r.ventas.map((v,i)=>`Venta ${i+1}: ${v.detalle||'—'} → S/${(parseFloat(v.precio)||0).toFixed(2)}`).join('<br>')}</div>
+        ${r.gastos.length?`<div class="hist-detalle" style="color:var(--color-text-secondary);margin-top:4px">Gastos: ${gastosStr}</div>`:''}
+        <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:13px">
+          <span style="color:var(--color-text-secondary)">Ventas S/${r.totalVentas.toFixed(2)} · Gastos S/${r.totalGastos.toFixed(2)}</span>
+          <span class="hist-saldo ${r.saldo>=0?'verde':'rojo'}">Saldo S/${r.saldo.toFixed(2)}</span>
+        </div>
+      </div>`;
+    }).join('');
+  }catch(e){el.innerHTML='<div class="empty">Error cargando historial</div>';}
+}
+</script>
