@@ -683,18 +683,61 @@ async function descargarPDF() {
       doc.text('Subtotal gastos:', M + 4, y); doc.text('S/' + (r.totalGastos || 0).toFixed(2), W - M, y, { align: 'right' }); y += 6;
     }
     if (r.movimientos && r.movimientos.length) {
-      checkPage(6);
-      doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5); doc.setTextColor(122, 92, 90);
-      doc.text('INVENTARIO', M + 2, y); y += 4;
-      r.movimientos.forEach(m => {
-        checkPage(5);
-        doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(70, 50, 48);
-        const cod = m.codigo ? `[${m.codigo}] ` : '';
-        const desc = m.descripcion ? (m.descripcion.length > 45 ? m.descripcion.substring(0, 42) + '...' : m.descripcion) : '—';
-        doc.text(`${m.tipo === 'entrada' ? '↓ E' : '↑ S'} ${cod}${desc}`, M + 4, y);
-        doc.setFont('helvetica', 'bold'); doc.text('×' + (m.cantidad || 0), W - M, y, { align: 'right' }); y += 5;
-      });
-      y += 1;
+      checkPage(8);
+      // Título sección inventario
+      doc.setFillColor(240, 245, 240);
+      doc.roundedRect(M, y, col, 7, 2, 2, 'F');
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(8); doc.setTextColor(46, 125, 50);
+      doc.text('MOVIMIENTO DE INVENTARIO', M + 4, y + 4.8);
+      y += 10;
+
+      // Entradas primero
+      const entsPDF = r.movimientos.filter(m => m.tipo === 'entrada');
+      const salsPDF = r.movimientos.filter(m => m.tipo === 'salida');
+
+      if (entsPDF.length) {
+        checkPage(6);
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5); doc.setTextColor(46, 125, 50);
+        doc.text('ENTRADAS', M + 4, y); y += 4;
+        entsPDF.forEach(m => {
+          checkPage(6);
+          const cod = m.codigo ? '[' + String(m.codigo) + '] ' : '';
+          const rawDesc = String(m.descripcion || '—');
+          const maxLen = 52 - cod.length;
+          const desc = rawDesc.length > maxLen ? rawDesc.substring(0, maxLen - 3) + '...' : rawDesc;
+          const cant = 'x' + String(m.cantidad || 0);
+          doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5); doc.setTextColor(46, 125, 50);
+          doc.text('+', M + 4, y);
+          doc.setFont('helvetica', 'normal'); doc.setTextColor(40, 60, 40);
+          doc.text(cod + desc, M + 9, y);
+          doc.setFont('helvetica', 'bold'); doc.setTextColor(46, 125, 50);
+          doc.text(cant, W - M, y, { align: 'right' });
+          y += 5.5;
+        });
+        y += 1;
+      }
+
+      if (salsPDF.length) {
+        checkPage(6);
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5); doc.setTextColor(230, 81, 0);
+        doc.text('SALIDAS', M + 4, y); y += 4;
+        salsPDF.forEach(m => {
+          checkPage(6);
+          const cod = m.codigo ? '[' + String(m.codigo) + '] ' : '';
+          const rawDesc = String(m.descripcion || '—');
+          const maxLen = 52 - cod.length;
+          const desc = rawDesc.length > maxLen ? rawDesc.substring(0, maxLen - 3) + '...' : rawDesc;
+          const cant = 'x' + String(m.cantidad || 0);
+          doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5); doc.setTextColor(230, 81, 0);
+          doc.text('-', M + 4, y);
+          doc.setFont('helvetica', 'normal'); doc.setTextColor(70, 40, 20);
+          doc.text(cod + desc, M + 9, y);
+          doc.setFont('helvetica', 'bold'); doc.setTextColor(230, 81, 0);
+          doc.text(cant, W - M, y, { align: 'right' });
+          y += 5.5;
+        });
+        y += 1;
+      }
     }
     checkPage(10);
     doc.setFillColor(r.saldo >= 0 ? 240 : 255, r.saldo >= 0 ? 248 : 235, r.saldo >= 0 ? 240 : 235);
